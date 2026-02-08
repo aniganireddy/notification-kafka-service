@@ -1,6 +1,6 @@
 package com.example.notification_service.service;
 
-import com.example.notification_service.event.AccountCreationEvent;
+import com.example.notification_service.event.AccountUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -11,30 +11,30 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AccountCreatedConsumer {
+public class AccountUpdateEventConsumer {
 
     private final JavaMailSender mailSender;
 
     @KafkaListener(
-            topics = "account-created-topic",
-            groupId = "notification-account-created-group",
+            topics = "account-updated-topic",
+            groupId = "notification-account-updated-group",
             properties = {
-                    "spring.json.value.default.type=com.example.notification_service.event.AccountCreationEvent"
+                    "spring.json.value.default.type=com.example.notification_service.event.AccountUpdateEvent"
             }
     )
 
 
-    public void consume(AccountCreationEvent event) {
+    public void consume(AccountUpdateEvent event) {
 
-        log.info("Received account creation event: {}", event);
+        log.info("Received account update event: {}", event);
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(event.getEmailId());
-        message.setSubject("Welcome to Anigani's Bank");
+        message.setSubject("Account Updated - Anigani's Bank");
         message.setText(
                 "Dear " + event.getFullName() + ",\n\n" +
-                        "Your account has been created successfully.\n" +
-                        "Account Number: " + event.getAccountNumber() + "\n\n" +
+                        "Your account details has been updated successfully.\n" +
+                        "Full Name: " + event.getFullName() + "\n\n" +
                         "Mobile Number: " + event.getMobileNumber() + "\n\n" +
                         "Thank you for banking with us.\n\n" +
                         "Best regards, \n\n" +
@@ -46,3 +46,4 @@ public class AccountCreatedConsumer {
         log.info("Welcome email sent to {}", event.getEmailId());
     }
 }
+
